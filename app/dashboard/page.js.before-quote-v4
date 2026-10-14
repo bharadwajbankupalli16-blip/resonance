@@ -1,0 +1,1398 @@
+﻿
+"use client";
+
+import ApplicationTracker from "../components/ApplicationTracker";
+import { useEffect, useState } from "react";
+import Link from "next/link";
+import {
+  LayoutDashboard,
+  FileText,
+  Sparkles,
+  ScanSearch,
+  BriefcaseBusiness,
+  Map,
+  BookOpen,
+  Bell,
+  ClipboardList,
+} from "lucide-react";
+
+
+
+const navigation = [
+  {
+    label: "Overview",
+    icon: "[ ]",
+    href: "/dashboard",
+    id: "overview",
+    group: "Main",
+  },
+  {
+    label: "Resume tools",
+    icon: "=",
+    href: "/resume-builder",
+    id: "resume",
+    group: "Resume",
+  },
+  {
+    label: "AI Writing Tools",
+    icon: "*",
+    href: "/ai-tools",
+    id: "ai-tools",
+    group: "Resume",
+  },
+  {
+    label: "Resume Analyzer",
+    icon: "O",
+    href: "/resume-analyzer",
+    id: "analyzer",
+    group: "Resume",
+  },
+  {
+    label: "IT Jobs",
+    icon: "#",
+    href: "/jobs",
+    id: "jobs",
+    group: "Jobs & Career",
+  },
+  {
+    label: "Career Roadmap & Resources",
+    icon: "@",
+    href: "/resources",
+    id: "roadmap",
+    group: "Jobs & Career",
+  },
+  {
+    label: "Job notifications",
+    icon: "!",
+    href: "/job-alerts",
+    id: "notifications",
+    group: "Jobs & Career",
+  },
+  {
+    label: "Applications",
+    icon: "[]",
+    href: "/applications",
+    id: "applications",
+    group: "Track",
+  },
+];
+
+
+const RES_LUCIDE_ICONS_STEP12 = {
+  overview: LayoutDashboard,
+  resume: FileText,
+  "ai-tools": Sparkles,
+  analyzer: ScanSearch,
+  jobs: BriefcaseBusiness,
+  roadmap: Map,
+  resources: BookOpen,
+  notifications: Bell,
+  applications: ClipboardList,
+};
+const quickTools = [
+  {
+    number: "01",
+    title: "Build your resume",
+    description: "Create a job-focused professional resume.",
+    href: "/resume-builder",
+    icon: "[ ]",
+  },
+  {
+    number: "02",
+    title: "Analyze your resume",
+    description: "Extract resume text and inspect important keywords.",
+    href: "/resume-analyzer",
+    icon: "=",
+  },
+  {
+    number: "03",
+    title: "Improve with AI",
+    description: "Generate summaries and improve resume bullet points.",
+    href: "/ai-tools",
+    icon: "*",
+  },
+  {
+    number: "04",
+    title: "Explore IT jobs",
+    description: "Search roles and explore job opportunities.",
+    href: "/jobs",
+    icon: "O",
+  },
+  
+{
+  number: "05",
+  title: "Career resources",
+  description: "Explore learning materials and projects for your target role.",
+  href: "/resources",
+  icon: "#",
+},
+{
+  number: "06",
+  title: "Job notifications",
+  description: "Manage your preferred role, location, and alert frequency.",
+  href: "/job-alerts",
+  icon: "@",
+},
+
+];
+
+export default function DashboardPage() {
+ 
+
+const [menuOpen, setMenuOpen] = useState(false);
+const [jobRole, setJobRole] = useState("Data Analyst");
+const [savedRole, setSavedRole] = useState("Data Analyst");
+const [notice, setNotice] = useState("");
+const [completedTasks, setCompletedTasks] = useState([]);
+
+
+useEffect(() => {
+  const saved = localStorage.getItem("resonanceTargetRole");
+
+  if (saved) {
+    setJobRole(saved);
+    setSavedRole(saved);
+  }
+
+  const roleForProgress = saved || "Data Analyst";
+  const progressKey = `resonanceDashboardProgress:${roleForProgress}`;
+
+  try {
+    const progress = JSON.parse(
+      localStorage.getItem(progressKey) || "[]"
+    );
+
+    if (Array.isArray(progress)) {
+      setCompletedTasks(progress);
+    }
+  } catch {
+    setCompletedTasks([]);
+  }
+}, []);
+
+
+
+  const roles = [
+    "Data Analyst",
+    "Data Scientist",
+    "Machine Learning Engineer",
+    "AI Engineer",
+    "Python Developer",
+    "Full Stack Developer",
+    "Frontend Developer",
+    "Backend Developer",
+    "Java Developer",
+    "Cloud Engineer",
+    "DevOps Engineer",
+    "Cybersecurity Analyst",
+    "Database Administrator",
+    "Business Analyst",
+    "Software Engineer",
+    "UI/UX Designer",
+    "Data Engineer",
+    "QA Engineer",
+  ];
+
+ 
+
+function saveRole() {
+  const previousKey = `resonanceDashboardProgress:${savedRole}`;
+  const nextKey = `resonanceDashboardProgress:${jobRole}`;
+
+  localStorage.setItem("resonanceTargetRole", jobRole);
+
+  if (savedRole !== jobRole) {
+    const nextProgress = JSON.parse(
+      localStorage.getItem(nextKey) || "[]"
+    );
+
+    setCompletedTasks(
+      Array.isArray(nextProgress) ? nextProgress : []
+    );
+  }
+
+  setSavedRole(jobRole);
+  setNotice(`Target role saved: ${jobRole}`);
+}
+
+
+
+  return (
+    <main className="res-dashboard">
+      <style>{`
+        .res-dashboard {
+          --dash-bg: #f4f8f6;
+          --dash-panel: #ffffff;
+          --dash-text: #17312f;
+          --dash-muted: #728582;
+          --dash-border: #dce8e3;
+          --dash-sidebar: #102b28;
+          --dash-sidebar-text: #eaf5f0;
+          --dash-accent: #ff897b;
+          min-height: 100vh;
+          display: flex;
+          background: var(--dash-bg);
+          color: var(--dash-text);
+          font-family: Helvetica, Arial, sans-serif;
+        }
+
+        html[data-theme="dark"] .res-dashboard {
+          --dash-bg: #0b1e1c;
+          --dash-panel: #142d29;
+          --dash-text: #edf6f2;
+          --dash-muted: #aec2bb;
+          --dash-border: #29453f;
+          --dash-sidebar: #0b2421;
+          --dash-sidebar-text: #edf6f2;
+          --dash-accent: #ff9788;
+        }
+
+        .res-sidebar {
+          width: 268px;
+          min-width: 268px;
+          box-sizing: border-box;
+          min-height: 100vh;
+          padding: 28px 16px 20px;
+          background: var(--dash-sidebar);
+          color: var(--dash-sidebar-text);
+          display: flex;
+          flex-direction: column;
+          border-right: 1px solid rgba(73, 163, 148, .28);
+        }
+
+        .res-brand {
+          display: inline-block;
+          margin: 3px 12px 50px;
+          color: #f2f8f5;
+          font-size: 22px;
+          font-weight: 800;
+          letter-spacing: 3px;
+          text-decoration: none;
+        }
+
+        .res-brand span { color: var(--dash-accent); }
+
+        
+.res-nav-label {
+  margin: 25px 12px 12px;
+  color: #83bdb1;
+  font-size: 12px;
+  font-weight: 800;
+  letter-spacing: 2.5px;
+  text-transform: uppercase;
+}
+
+.res-nav > div:first-child .res-nav-label {
+  margin-top: 0;
+}
+
+.res-nav {
+  display: flex;
+  flex-direction: column;
+  gap: 5px;
+}
+
+.res-nav-link {
+  display: flex;
+  align-items: center;
+  gap: 15px;
+  min-height: 58px;
+  padding: 0 17px;
+  border: 1px solid transparent;
+  border-radius: 16px;
+  color: var(--dash-sidebar-text);
+  text-decoration: none;
+  font-size: 15px;
+  transition:
+    background .2s,
+    transform .2s,
+    border-color .2s;
+}
+
+.res-nav-link:hover {
+  background: rgba(54, 183, 163, .12);
+  border-color: rgba(73, 190, 170, .2);
+  transform: translateX(2px);
+}
+
+.res-nav-link.active {
+  background: #21453f;
+  border-color: rgba(255, 137, 123, .18);
+  box-shadow: inset 4px 0 0 var(--dash-accent);
+}
+
+.res-nav-icon {
+  display: grid;
+  place-items: center;
+  flex-shrink: 0;
+  width: 24px;
+  height: 26px;
+  color: var(--dash-accent);
+  font-size: 23px;
+  font-weight: 600;
+  text-align: center;
+}
+
+.res-nav-text {
+  flex: 1;
+}
+
+.res-nav-arrow {
+  color: #79b9ad;
+  font-size: 24px;
+  line-height: 1;
+  opacity: 0;
+  transition: opacity .2s;
+}
+
+.res-nav-link:hover .res-nav-arrow,
+.res-nav-link.active .res-nav-arrow {
+  opacity: 1;
+}
+
+        }
+
+        .res-sidebar-bottom {
+          margin-top: auto;
+          padding: 24px 20px;
+          border: 1px solid #35534d;
+          border-radius: 22px;
+          background: rgba(255,255,255,.045);
+        }
+
+        .res-bottom-star {
+          color: var(--dash-accent);
+          font-size: 25px;
+        }
+
+        .res-sidebar-bottom h3 {
+          margin: 16px 0 9px;
+          font-size: 15px;
+        }
+
+        .res-sidebar-bottom p {
+          margin: 0;
+          color: #d0e2dc;
+          font-size: 13px;
+          line-height: 1.7;
+        }
+
+        .res-sidebar-bottom a {
+          display: inline-block;
+          margin-top: 18px;
+          color: var(--dash-accent);
+          font-size: 13px;
+          font-weight: 700;
+          text-decoration: none;
+        }
+
+        .res-main {
+          flex: 1;
+          min-width: 0;
+          padding: 32px clamp(18px, 4vw, 54px) 48px;
+        }
+
+        .res-mobile-header { display: none; }
+
+        .res-topbar {
+          display: flex;
+          align-items: center;
+          justify-content: space-between;
+          gap: 18px;
+          margin-bottom: 42px;
+        }
+
+        .res-eyebrow {
+          margin: 0 0 10px;
+          color: #339b8b;
+          font-size: 11px;
+          font-weight: 800;
+          letter-spacing: 2px;
+          text-transform: uppercase;
+        }
+
+        .res-topbar h1 {
+          margin: 0;
+          font-size: clamp(27px, 3vw, 38px);
+          letter-spacing: -1.4px;
+        }
+
+        .res-date {
+          color: var(--dash-muted);
+          font-size: 13px;
+        }
+
+        .res-welcome {
+          display: flex;
+          justify-content: space-between;
+          align-items: center;
+          gap: 22px;
+          padding: clamp(23px, 3vw, 38px);
+          border-radius: 24px;
+          background: #19463f;
+          color: #f1faf6;
+          overflow: hidden;
+          position: relative;
+        }
+
+        .res-welcome::after {
+          content: "";
+          position: absolute;
+          width: 210px;
+          height: 210px;
+          right: 7%;
+          top: -115px;
+          border: 1px solid rgba(255,255,255,.12);
+          border-radius: 50%;
+          box-shadow: 0 0 0 28px rgba(255,255,255,.025),
+                      0 0 0 57px rgba(255,255,255,.025);
+          pointer-events: none;
+        }
+
+        .res-welcome h2 {
+          margin: 0 0 12px;
+          font-size: clamp(23px, 2.8vw, 32px);
+          letter-spacing: -.8px;
+        }
+
+        .res-welcome p {
+          max-width: 540px;
+          margin: 0;
+          color: #c5ddd5;
+          font-size: 14px;
+          line-height: 1.8;
+        }
+
+        .res-welcome-tag {
+          flex-shrink: 0;
+          padding: 12px 16px;
+          border: 1px solid rgba(255,255,255,.2);
+          border-radius: 12px;
+          color: #fff;
+          font-size: 12px;
+        }
+
+        .res-section-heading {
+          display: flex;
+          align-items: end;
+          justify-content: space-between;
+          gap: 15px;
+          margin: 36px 0 18px;
+        }
+
+        .res-section-heading h2 {
+          margin: 0;
+          font-size: 21px;
+          letter-spacing: -.5px;
+        }
+
+        .res-section-heading p {
+          margin: 7px 0 0;
+          color: var(--dash-muted);
+          font-size: 13px;
+        }
+
+        .res-grid {
+          display: grid;
+          grid-template-columns: repeat(2, minmax(0, 1fr));
+          gap: 16px;
+        }
+
+        .res-card {
+          min-width: 0;
+          box-sizing: border-box;
+          padding: 23px;
+          border: 1px solid var(--dash-border);
+          border-radius: 20px;
+          background: var(--dash-panel);
+          color: var(--dash-text);
+        }
+
+        .res-tool-card {
+          display: block;
+          color: inherit;
+          text-decoration: none;
+          transition: transform .2s, border-color .2s;
+        }
+
+        .res-tool-card:hover {
+          transform: translateY(-3px);
+          border-color: #4ba99a;
+        }
+
+        .res-tool-top {
+          display: flex;
+          align-items: center;
+          justify-content: space-between;
+          gap: 10px;
+        }
+
+        .res-tool-icon {
+          display: grid;
+          place-items: center;
+          width: 43px;
+          height: 43px;
+          border-radius: 13px;
+          background: rgba(63, 161, 144, .13);
+          color: #359889;
+          font-size: 23px;
+        }
+
+        .res-tool-number {
+          color: var(--dash-muted);
+          font-size: 12px;
+        }
+
+        .res-tool-card h3 {
+          margin: 22px 0 8px;
+          font-size: 17px;
+        }
+
+        .res-tool-card p {
+          margin: 0;
+          color: var(--dash-muted);
+          font-size: 13px;
+          line-height: 1.7;
+        }
+
+        .res-tool-link {
+          display: inline-block;
+          margin-top: 18px;
+          color: #329888;
+          font-size: 13px;
+          font-weight: 700;
+        }
+
+        html[data-theme="dark"] .res-tool-link {
+          color: #78d0bd;
+        }
+
+        .res-role-panel {
+          display: grid;
+          grid-template-columns: minmax(0, 1fr) auto;
+          align-items: end;
+          gap: 16px;
+        }
+
+        .res-role-panel label {
+          display: block;
+          margin-bottom: 10px;
+          font-size: 13px;
+          font-weight: 700;
+        }
+
+        .res-role-panel select {
+          width: 100%;
+          min-height: 46px;
+          box-sizing: border-box;
+          padding: 11px 12px;
+          border: 1px solid var(--dash-border);
+          border-radius: 10px;
+          background: var(--dash-panel);
+          color: var(--dash-text);
+          font: inherit;
+        }
+
+        .res-primary-button {
+          min-height: 46px;
+          padding: 0 18px;
+          border: 0;
+          border-radius: 10px;
+          background: #258d7d;
+          color: #fff;
+          font: inherit;
+          font-size: 13px;
+          font-weight: 700;
+          cursor: pointer;
+        }
+
+        .res-primary-button:hover { background: #207b6e; }
+
+        .res-notice {
+          margin: 14px 0 0;
+          color: #319782;
+          font-size: 13px;
+        }
+
+        .res-lower-grid {
+          display: grid;
+          grid-template-columns: repeat(2, minmax(0, 1fr));
+          gap: 16px;
+          margin-top: 16px;
+        }
+
+        .res-list-item {
+          display: flex;
+          align-items: flex-start;
+          gap: 12px;
+          padding: 15px 0;
+          border-bottom: 1px solid var(--dash-border);
+        }
+
+        .res-list-item:last-child { border-bottom: 0; }
+
+        .res-list-dot {
+          display: grid;
+          place-items: center;
+          flex-shrink: 0;
+          width: 30px;
+          height: 30px;
+          border-radius: 10px;
+          background: rgba(63, 161, 144, .13);
+          color: #329888;
+        }
+
+        .res-list-item strong {
+          display: block;
+          font-size: 13px;
+        }
+
+        .res-list-item span {
+          display: block;
+          margin-top: 5px;
+          color: var(--dash-muted);
+          font-size: 12px;
+          line-height: 1.6;
+        }
+
+        .res-footer {
+          margin-top: 30px;
+          color: var(--dash-muted);
+          font-size: 12px;
+          text-align: center;
+        }
+
+        @media (max-width: 900px) {
+          .res-sidebar {
+            width: 230px;
+            min-width: 230px;
+          }
+          .res-welcome-tag { display: none; }
+        }
+
+        @media (max-width: 680px) {
+          .res-dashboard { display: block; }
+
+          .res-mobile-header {
+            display: flex;
+            align-items: center;
+            justify-content: space-between;
+            padding: 15px 18px;
+            background: var(--dash-sidebar);
+            color: white;
+          }
+
+          .res-mobile-header .res-brand {
+            margin: 0;
+            font-size: 17px;
+          }
+
+          .res-menu-button {
+            padding: 8px 12px;
+            border: 1px solid #42635b;
+            border-radius: 9px;
+            background: transparent;
+            color: white;
+            font-size: 19px;
+          }
+
+          .res-sidebar {
+            display: none;
+            width: 100%;
+            min-width: 0;
+            min-height: auto;
+            padding: 22px 16px;
+          }
+
+          .res-sidebar.open { display: flex; }
+
+          .res-sidebar .res-brand { display: none; }
+          .res-sidebar-bottom { margin-top: 24px; }
+
+          .res-main { padding: 26px 16px 36px; }
+          .res-topbar { margin-bottom: 25px; }
+          .res-date { display: none; }
+
+          .res-grid,
+          .res-lower-grid {
+            grid-template-columns: 1fr;
+          }
+
+          .res-card { padding: 20px; }
+
+          .res-role-panel { grid-template-columns: 1fr; }
+
+          .res-role-panel .res-primary-button { width: 100%; }
+
+          .res-section-heading { margin-top: 29px; }
+        }
+      
+        /* RES_FIXED_SIDEBAR_STEP7 */
+        @media (min-width: 681px) {
+          .res-sidebar {
+            position: fixed;
+            top: 0;
+            left: 0;
+            bottom: 0;
+            height: 100vh;
+            min-height: 0;
+            overflow-y: auto;
+            overflow-x: hidden;
+            overscroll-behavior: contain;
+            scrollbar-width: thin;
+            z-index: 100;
+          }
+
+          .res-main {
+            margin-left: 268px;
+            min-width: 0;
+            min-height: 100vh;
+          }
+        }
+
+        @media (min-width: 681px) and (max-width: 900px) {
+          .res-main {
+            margin-left: 230px;
+          }
+        }
+
+        /* RES_REMOVE_UNWANTED_LINE_STEP8 */
+        @media (min-width: 681px) {
+          .res-sidebar {
+            border-bottom: 0 !important;
+          }
+
+          .res-main {
+            border-top: 0 !important;
+          }
+        }
+
+        /* RES_REMOVE_SIDEBAR_DIVIDER */
+        @media (min-width: 681px) {
+          .res-sidebar {
+            border-right: 0 !important;
+          }
+        }
+
+        /* RES_HIDE_SIDEBAR_SCROLLBAR */
+        @media (min-width: 681px) {
+          .res-sidebar {
+            scrollbar-width: none !important;
+            -ms-overflow-style: none !important;
+          }
+
+          .res-sidebar::-webkit-scrollbar {
+            display: none !important;
+            width: 0 !important;
+            height: 0 !important;
+          }
+        }
+
+/* RESONANCE_SAFE_SIDEBAR_FIX */
+@media (min-width: 681px) {
+  .res-sidebar {
+    border-right: none !important;
+    box-shadow: none !important;
+    scrollbar-width: none !important;
+  }
+  .res-sidebar::-webkit-scrollbar {
+    display: none !important;
+    width: 0 !important;
+  }
+}
+/* END RESONANCE_SAFE_SIDEBAR_FIX */
+
+/* RESONANCE_OVERVIEW_MOTION_V1 */
+.overview-enter {
+  animation: resOverviewRise .55s ease both;
+}
+.overview-hero {
+  position: relative;
+  isolation: isolate;
+  overflow: hidden;
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  gap: 24px;
+  min-height: 260px;
+  padding: clamp(24px, 4vw, 42px);
+  border-radius: 24px;
+  background: linear-gradient(120deg, #153f3b, #176e62 65%, #269987);
+  color: #f5fffb;
+  margin: 8px 0 24px;
+}
+.overview-hero::after {
+  content: "";
+  position: absolute;
+  width: 300px;
+  height: 300px;
+  border-radius: 50%;
+  right: 8%;
+  top: -180px;
+  background: rgba(255,255,255,.10);
+  filter: blur(2px);
+  z-index: -1;
+}
+.overview-hero-copy { max-width: 570px; }
+.overview-pill, .overview-kicker {
+  font-size: 10px;
+  font-weight: 800;
+  letter-spacing: 1.8px;
+}
+.overview-pill {
+  color: #a9f0df;
+  display: inline-block;
+  margin-bottom: 14px;
+}
+.overview-hero h2 {
+  font-size: clamp(28px, 3.2vw, 42px);
+  line-height: 1.12;
+  letter-spacing: -1.2px;
+  margin: 0 0 13px;
+}
+.overview-hero p {
+  color: #d3e9e2;
+  line-height: 1.7;
+  font-size: 14px;
+  max-width: 490px;
+  margin: 0;
+}
+.overview-actions {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 10px;
+  margin-top: 22px;
+}
+.overview-primary, .overview-secondary {
+  display: inline-flex;
+  align-items: center;
+  gap: 12px;
+  padding: 11px 15px;
+  border-radius: 11px;
+  text-decoration: none;
+  font-size: 13px;
+  font-weight: 750;
+  transition: transform .2s ease, background .2s ease;
+}
+.overview-primary {
+  background: #b5f0df;
+  color: #123d36;
+}
+.overview-secondary {
+  border: 1px solid rgba(255,255,255,.32);
+  color: white;
+}
+.overview-primary:hover, .overview-secondary:hover { transform: translateY(-2px); }
+.overview-orbit {
+  width: 190px;
+  height: 190px;
+  flex: 0 0 190px;
+  display: grid;
+  place-items: center;
+  position: relative;
+  margin: 0 3% 0 0;
+}
+.overview-orbit-ring {
+  position: absolute;
+  inset: 8px;
+  border: 1px solid rgba(202,255,239,.38);
+  border-radius: 50%;
+  animation: resOrbitSpin 18s linear infinite;
+}
+.overview-orbit-ring::before, .overview-orbit-ring::after {
+  content: "";
+  position: absolute;
+  border: 1px solid rgba(202,255,239,.25);
+  border-radius: 50%;
+}
+.overview-orbit-ring::before { inset: 17px -12px; transform: rotate(40deg); }
+.overview-orbit-ring::after { inset: -12px 17px; transform: rotate(-40deg); }
+.overview-orbit-core {
+  display: grid;
+  place-items: center;
+  width: 82px;
+  height: 82px;
+  border-radius: 25px;
+  background: linear-gradient(145deg, #d4fff1, #80d9c3);
+  color: #145349;
+  font-size: 34px;
+  font-weight: 900;
+  box-shadow: 0 15px 45px rgba(0,0,0,.2);
+  animation: resCoreFloat 4s ease-in-out infinite;
+}
+.overview-float {
+  position: absolute;
+  display: grid;
+  place-items: center;
+  width: 34px;
+  height: 34px;
+  border-radius: 12px;
+  background: rgba(255,255,255,.15);
+  border: 1px solid rgba(255,255,255,.22);
+  color: #eafff8;
+  backdrop-filter: blur(8px);
+  animation: resCoreFloat 3.5s ease-in-out infinite;
+}
+.overview-float-one { top: 8px; right: 22px; }
+.overview-float-two { bottom: 18px; right: 2px; animation-delay: -.8s; }
+.overview-float-three { bottom: 12px; left: 10px; animation-delay: -1.5s; }
+.overview-stats {
+  display: grid;
+  grid-template-columns: repeat(3, minmax(0, 1fr));
+  gap: 16px;
+  margin-bottom: 34px;
+}
+.overview-stat, .overview-panel, .overview-tool {
+  background: var(--dash-panel);
+  border: 1px solid var(--dash-border);
+  border-radius: 18px;
+  color: var(--dash-text);
+}
+.overview-stat {
+  padding: 20px;
+  min-width: 0;
+  transition: transform .2s ease, border-color .2s ease;
+}
+.overview-stat:hover { transform: translateY(-3px); border-color: #57b8a5; }
+.overview-stat-icon {
+  display: grid;
+  place-items: center;
+  width: 37px;
+  height: 37px;
+  border-radius: 12px;
+  background: rgba(47,158,137,.13);
+  color: #329888;
+  font-size: 20px;
+  margin-bottom: 16px;
+}
+.overview-stat-label, .overview-stat-note {
+  display: block;
+  color: var(--dash-muted);
+  font-size: 12px;
+}
+.overview-stat-value {
+  display: block;
+  overflow-wrap: anywhere;
+  font-size: clamp(17px, 2vw, 23px);
+  margin: 7px 0;
+}
+.overview-stat-value small { font-size: 12px; font-weight: 600; }
+.overview-stat-note { line-height: 1.5; margin-top: 8px; }
+.overview-progress, .overview-roadmap-bar {
+  height: 6px;
+  overflow: hidden;
+  border-radius: 10px;
+  background: var(--dash-border);
+  margin-top: 12px;
+}
+.overview-progress div, .overview-roadmap-bar div {
+  height: 100%;
+  border-radius: inherit;
+  background: linear-gradient(90deg, #29927f, #79d7bf);
+  transition: width .7s ease;
+}
+.overview-section { margin: 0 0 34px; }
+.overview-heading {
+  display: flex;
+  align-items: end;
+  justify-content: space-between;
+  gap: 12px;
+  margin-bottom: 17px;
+}
+.overview-heading h2, .overview-panel h2 {
+  font-size: 21px;
+  margin: 6px 0;
+  letter-spacing: -.4px;
+}
+.overview-heading p, .overview-panel > p {
+  color: var(--dash-muted);
+  font-size: 13px;
+  line-height: 1.6;
+  margin: 0;
+}
+.overview-kicker { color: #329888; }
+.overview-heading-mark {
+  color: var(--dash-muted);
+  font-size: 10px;
+  letter-spacing: 1px;
+  white-space: nowrap;
+}
+.overview-tools {
+  display: grid;
+  grid-template-columns: repeat(3, minmax(0, 1fr));
+  gap: 14px;
+}
+.overview-tool {
+  padding: 19px;
+  text-decoration: none;
+  display: flex;
+  flex-direction: column;
+  min-height: 190px;
+  animation: resOverviewRise .5s ease both;
+  transition: transform .2s ease, border-color .2s ease, box-shadow .2s ease;
+}
+.overview-tool:hover {
+  transform: translateY(-4px);
+  border-color: #63bba8;
+  box-shadow: 0 12px 30px rgba(31,104,88,.09);
+}
+.overview-tool-top { display: flex; justify-content: space-between; align-items: center; }
+.overview-tool-number {
+  color: #329888;
+  font-size: 11px;
+  font-weight: 800;
+  letter-spacing: 1px;
+}
+.overview-tool-arrow { color: var(--dash-muted); font-size: 19px; }
+.overview-tool h3 { font-size: 16px; margin: 21px 0 8px; }
+.overview-tool p {
+  color: var(--dash-muted);
+  font-size: 12px;
+  line-height: 1.65;
+  margin: 0 0 17px;
+}
+.overview-tool-link {
+  color: #329888;
+  font-size: 12px;
+  font-weight: 750;
+  margin-top: auto;
+}
+.overview-bottom {
+  display: grid;
+  grid-template-columns: minmax(0, 1.05fr) minmax(0, .95fr);
+  gap: 16px;
+  margin-bottom: 26px;
+}
+.overview-panel { padding: clamp(18px, 2.5vw, 25px); min-width: 0; }
+.overview-roadmap-count {
+  display: block;
+  font-size: 11px;
+  color: var(--dash-muted);
+  margin: 8px 0 15px;
+}
+.overview-check-row {
+  display: flex;
+  align-items: center;
+  gap: 10px;
+  padding: 12px 0;
+  border-bottom: 1px solid var(--dash-border);
+  cursor: pointer;
+}
+.overview-check-row:last-child { border-bottom: 0; }
+.overview-check-row input { accent-color: #329888; flex: 0 0 auto; }
+.overview-check-title { flex: 1; min-width: 0; font-size: 12px; font-weight: 650; }
+.overview-check-link, .overview-application-link {
+  color: #329888;
+  font-size: 11px;
+  font-weight: 750;
+  text-decoration: none;
+  white-space: nowrap;
+}
+.overview-tracker-wrap { margin-top: 20px; min-width: 0; }
+.overview-application-link {
+  display: inline-flex;
+  gap: 10px;
+  margin-top: 18px;
+  font-size: 12px;
+}
+@keyframes resOverviewRise {
+  from { opacity: 0; transform: translateY(12px); }
+  to { opacity: 1; transform: translateY(0); }
+}
+@keyframes resOrbitSpin { to { transform: rotate(360deg); } }
+@keyframes resCoreFloat {
+  0%, 100% { transform: translateY(0); }
+  50% { transform: translateY(-6px); }
+}
+@media (max-width: 980px) {
+  .overview-tools { grid-template-columns: repeat(2, minmax(0, 1fr)); }
+  .overview-orbit { width: 145px; height: 145px; flex-basis: 145px; }
+  .overview-stats { gap: 10px; }
+  .overview-stat { padding: 15px; }
+}
+@media (max-width: 680px) {
+  .overview-hero { min-height: 0; padding: 25px 21px; border-radius: 19px; }
+  .overview-orbit { display: none; }
+  .overview-stats { grid-template-columns: 1fr; gap: 11px; }
+  .overview-stat { display: grid; grid-template-columns: 38px minmax(0,1fr); column-gap: 12px; align-items: center; }
+  .overview-stat-icon { grid-row: span 3; margin: 0; }
+  .overview-stat-label, .overview-stat-value, .overview-stat-note, .overview-progress { grid-column: 2; }
+  .overview-stat-value { margin: 4px 0; }
+  .overview-tools, .overview-bottom { grid-template-columns: 1fr; }
+  .overview-tool { min-height: 160px; }
+  .overview-heading-mark { display: none; }
+}
+@media (prefers-reduced-motion: reduce) {
+  .overview-enter, .overview-orbit-ring, .overview-orbit-core, .overview-float, .overview-tool {
+    animation: none !important;
+  }
+  .overview-stat, .overview-tool, .overview-primary, .overview-secondary {
+    transition: none !important;
+  }
+}
+/* END RESONANCE_OVERVIEW_MOTION_V1 */
+`}
+
+
+
+</style>
+
+      <header className="res-mobile-header">
+        <Link className="res-brand" href="/dashboard">
+          RESONANCE<span>.</span>
+        </Link>
+        <button
+          className="res-menu-button"
+          type="button"
+          onClick={() => setMenuOpen(!menuOpen)}
+          aria-expanded={menuOpen}
+          aria-label="Toggle navigation"
+        >
+          {menuOpen ? "×" : "☰"}
+        </button>
+      </header>
+
+      <aside className={`res-sidebar ${menuOpen ? "open" : ""}`}>
+        <Link className="res-brand" href="/dashboard">
+          RESONANCE<span>.</span>
+        </Link>
+
+        <p className="res-nav-label">Workspace</p>
+
+              
+<nav className="res-nav" aria-label="Main navigation">
+  {navigation.map((item, index) => {
+    const previousGroup = navigation[index - 1]?.group;
+    const showGroup = item.group !== previousGroup;
+
+    return (
+      <div key={item.id}>
+        {showGroup && (
+          <p className="res-nav-label">
+            {item.group}
+          </p>
+        )}
+
+        <Link
+          href={item.href}
+          className={`res-nav-link ${
+            item.id === "overview" ? "active" : ""
+          }`}
+          onClick={() => setMenuOpen(false)}
+        >
+          <span className="res-nav-icon" aria-hidden="true">
+            {(() => {
+              const Icon = RES_LUCIDE_ICONS_STEP12[item.id] || FileText;
+              return <Icon size={19} strokeWidth={1.9} />;
+            })()}
+          </span>
+
+          <span className="res-nav-text">{item.label}</span>
+          <span className="res-nav-arrow" aria-hidden="true">
+            ›
+          </span>
+        </Link>
+      </div>
+    );
+  })}
+</nav>
+
+        <div className="res-sidebar-bottom">
+          <div className="res-bottom-star">✦</div>
+          <h3>Your next chapter</h3>
+          <p>Small steps build career momentum.</p>
+          <Link href="/resume-builder" onClick={() => setMenuOpen(false)}>
+            Improve your resume →
+          </Link>
+        </div>
+      </aside>
+
+      <div className="res-main">
+        <div className="res-topbar overview-enter">
+  <div>
+    <p className="res-eyebrow">YOUR PERSONAL WORKSPACE</p>
+    <h1>Overview <span id="RESONANCE_RENDER_TEST" style={{ color: "#ff7464" }}>●</span></h1>
+    <p style={{ color: "var(--dash-muted)", margin: "8px 0 0", fontSize: 14 }}>
+      Your next career move starts here.
+    </p>
+  </div>
+  <div className="res-date">RESONANCE · RESUME INTELLIGENCE</div>
+</div>
+
+<section className="overview-hero overview-enter">
+  <div className="overview-hero-copy">
+    <span className="overview-pill">✦ YOUR CAREER, IN FOCUS</span>
+    <h2>Make your next move<br />a meaningful one.</h2>
+    <p>
+      Build a stronger resume, discover opportunities, and develop the skills
+      for your target role — one step at a time.
+    </p>
+    <div className="overview-actions">
+      <Link href="/resume-builder" className="overview-primary">
+        Build my resume <span aria-hidden="true">→</span>
+      </Link>
+      <Link href="/jobs" className="overview-secondary">
+        Explore IT jobs
+      </Link>
+    </div>
+  </div>
+  <div className="overview-orbit" aria-hidden="true">
+    <div className="overview-orbit-ring"></div>
+    <div className="overview-orbit-core">R</div>
+    <span className="overview-float overview-float-one">✦</span>
+    <span className="overview-float overview-float-two">↗</span>
+    <span className="overview-float overview-float-three">✓</span>
+  </div>
+</section>
+<section className="overview-quote overview-enter" aria-label="Daily motivation">
+  <div className="overview-quote-icon" aria-hidden="true">✦</div>
+  <div className="overview-quote-copy">
+    <span className="overview-kicker">A LITTLE MOTIVATION</span>
+    <p>“Small steps every day lead to meaningful career growth.”</p>
+    <span className="overview-quote-caption">
+      Keep learning. Keep building. Keep moving forward.
+    </span>
+  </div>
+  <span className="overview-quote-sparkle" aria-hidden="true">✧</span>
+</section>
+
+
+<section className="overview-stats overview-enter" aria-label="Career progress">
+  <article className="overview-stat">
+    <span className="overview-stat-icon">◎</span>
+    <span className="overview-stat-label">Target role</span>
+    <strong className="overview-stat-value">{savedRole}</strong>
+    <span className="overview-stat-note">Your current career focus</span>
+  </article>
+  <article className="overview-stat">
+    <span className="overview-stat-icon">✓</span>
+    <span className="overview-stat-label">Roadmap progress</span>
+    <strong className="overview-stat-value">{completedTasks.length} <small>/ 5 steps</small></strong>
+    <div className="overview-progress">
+      <div style={{ width: `${Math.min(100, completedTasks.length / 5 * 100)}%` }} />
+    </div>
+    <span className="overview-stat-note">Keep building your momentum</span>
+  </article>
+  <article className="overview-stat">
+    <span className="overview-stat-icon">✧</span>
+    <span className="overview-stat-label">Resume tools</span>
+    <strong className="overview-stat-value">{quickTools.length}</strong>
+    <span className="overview-stat-note">Tools available to explore</span>
+  </article>
+</section>
+
+<section className="overview-section overview-enter">
+  <div className="overview-heading">
+    <div>
+      <span className="overview-kicker">YOUR TOOLKIT</span>
+      <h2>Make progress today</h2>
+      <p>Choose a tool and take your next step.</p>
+    </div>
+    <span className="overview-heading-mark">01 / EXPLORE</span>
+  </div>
+
+  <div className="overview-tools">
+    {quickTools.map((item, index) => (
+      <Link
+        key={item.number}
+        href={item.href}
+        className="overview-tool"
+        style={{ animationDelay: `${index * 75}ms` }}
+      >
+        <div className="overview-tool-top">
+          <span className="overview-tool-number">{item.number}</span>
+          <span className="overview-tool-arrow" aria-hidden="true">↗</span>
+        </div>
+        <h3>{item.title}</h3>
+        <p>{item.description}</p>
+        <span className="overview-tool-link">Open tool →</span>
+      </Link>
+    ))}
+  </div>
+</section>
+
+<section className="overview-bottom overview-enter">
+  <article className="overview-panel">
+    <span className="overview-kicker">YOUR NEXT STEP</span>
+    <h2>Career roadmap</h2>
+    <p>
+      Your plan for becoming a {savedRole}. Complete these five steps at
+      your own pace.
+    </p>
+    <div className="overview-roadmap-bar">
+      <div style={{ width: `${Math.min(100, completedTasks.length / 5 * 100)}%` }} />
+    </div>
+    <span className="overview-roadmap-count">
+      {completedTasks.length} of 5 steps completed
+    </span>
+    {[
+      { title: "Build your resume", href: "/resume-builder" },
+      { title: "Analyze your resume", href: "/resume-analyzer" },
+      { title: "Improve with AI", href: "/ai-tools" },
+      { title: "Explore relevant jobs", href: "/jobs" },
+      { title: "Learn role-specific skills", href: "/resources" },
+    ].map((task, index) => (
+      <label className="overview-check-row" key={task.title}>
+        <input
+          type="checkbox"
+          checked={completedTasks.includes(index)}
+          onChange={(event) => {
+            const next = event.target.checked
+              ? [...completedTasks, index]
+              : completedTasks.filter((item) => item !== index);
+            setCompletedTasks(next);
+            localStorage.setItem(
+              `resonanceDashboardProgress:${savedRole}`,
+              JSON.stringify(next)
+            );
+          }}
+        />
+        <span className="overview-check-title">{task.title}</span>
+        <Link
+          href={task.href}
+          className="overview-check-link"
+          onClick={(event) => event.stopPropagation()}
+        >
+          Open →
+        </Link>
+      </label>
+    ))}
+  </article>
+
+  <article className="overview-panel overview-application-panel">
+    <span className="overview-kicker">STAY ORGANIZED</span>
+    <h2>Application tracker</h2>
+    <p>Keep your job-search activity organized in one place.</p>
+    <div className="overview-tracker-wrap">
+      <ApplicationTracker />
+    </div>
+    <Link href="/applications" className="overview-application-link">
+      View applications <span aria-hidden="true">→</span>
+    </Link>
+  </article>
+</section>
+<p className="res-footer">
+          RESONANCE | Resume Intelligence Workspace
+        </p>
+      </div>
+    </main>
+  );
+}
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+

@@ -1,0 +1,205 @@
+
+"use client";
+
+import { useState } from "react";
+import Link from "next/link";
+
+export default function AIToolsPage() {
+  const [tool, setTool] = useState("summary");
+  const [role, setRole] = useState("");
+  const [content, setContent] = useState("");
+  const [result, setResult] = useState("");
+  const [error, setError] = useState("");
+  const [loading, setLoading] = useState(false);
+
+  async function generateText() {
+    setError("");
+    setResult("");
+
+    if (!role.trim() || !content.trim()) {
+      setError("Enter your target job role and resume information.");
+      return;
+    }
+
+    setLoading(true);
+
+    try {
+      const response = await fetch("/api/ai-tools", {
+        method: "POST",
+        headers: { "Content-Type": "application/json" },
+        body: JSON.stringify({
+          tool,
+          role: role.trim(),
+          content: content.trim(),
+          jobDescription: "",
+        }),
+      });
+
+      const data = await response.json();
+
+      if (!response.ok) {
+        throw new Error(data.error || "AI generation failed.");
+      }
+
+      setResult(data.result || "");
+    } catch (err) {
+      setError(err.message || "Unable to generate suggestions.");
+    } finally {
+      setLoading(false);
+    }
+  }
+
+  async function copyResult() {
+    try {
+      await navigator.clipboard.writeText(result);
+      setError("");
+      alert("Text copied successfully!");
+    } catch {
+      setError("Copy failed. Select the result and copy it manually.");
+    }
+  }
+
+  const fieldStyle = {
+    display: "block",
+    width: "100%",
+    boxSizing: "border-box",
+    padding: 12,
+    margin: "8px 0 20px",
+    border: "1px solid var(--border, #dce5e2)",
+    borderRadius: 8,
+    background: "var(--background)",
+    color: "var(--foreground)",
+    font: "inherit",
+  };
+
+  const buttonStyle = {
+    padding: "12px 18px",
+    border: 0,
+    borderRadius: 9,
+    background: "#269987",
+    color: "#fff",
+    fontWeight: 600,
+    cursor: "pointer",
+  };
+
+  return (
+    <main
+      style={{
+        minHeight: "100vh",
+        padding: "36px 20px",
+        background: "var(--background)",
+        color: "var(--foreground)",
+      }}
+    >
+      <div style={{ maxWidth: 850, margin: "0 auto" }}>
+        <Link href="/dashboard" style={{ color: "#269987" }}>
+          ← Back to Dashboard
+        </Link>
+
+        <div className="resume-brand-bar">
+  <Link href="/dashboard" className="resume-brand-back">
+    <span aria-hidden="true">←</span>
+    <span>RESONANCE<span className="resume-brand-dot">.</span></span>
+  </Link>
+</div>
+<h1 style={{ marginTop: 24 }}>AI Resume Writing Tools</h1>
+        <p style={{ opacity: 0.75 }}>
+          Improve your resume for your target job role.
+        </p>
+
+        <section
+          style={{
+            marginTop: 24,
+            padding: 24,
+            border: "1px solid var(--border, #dce5e2)",
+            borderRadius: 16,
+            background: "var(--card, transparent)",
+          }}
+        >
+          <label htmlFor="tool">Choose a tool</label>
+          
+
+<select
+  id="tool"
+  value={tool}
+  onChange={(e) => setTool(e.target.value)}
+  style={{
+    ...fieldStyle,
+    backgroundColor: "var(--card, #ffffff)",
+    color: "var(--foreground, #17252a)",
+    borderColor: "var(--border, #dce5e2)",
+    colorScheme: "light dark",
+  }}
+>
+  <option value="summary">Professional Summary</option>
+  <option value="bullet">Improve Bullet Points</option>
+  <option value="skills">Skills & Keywords</option>
+</select>
+
+          <label htmlFor="role">Target job role</label>
+          <input
+            id="role"
+            value={role}
+            onChange={(e) => setRole(e.target.value)}
+            placeholder="e.g. Data Analyst"
+            style={fieldStyle}
+          />
+
+          <label htmlFor="content">
+            Resume information, skills, or project details
+          </label>
+          <textarea
+            id="content"
+            value={content}
+            onChange={(e) => setContent(e.target.value)}
+            placeholder="Enter your real skills, experience, projects, or resume text..."
+            rows={6}
+            style={fieldStyle}
+          />
+
+          <button
+            type="button"
+            onClick={generateText}
+            disabled={loading}
+            style={{
+              ...buttonStyle,
+              opacity: loading ? 0.7 : 1,
+            }}
+          >
+            {loading ? "Generating..." : "Generate Suggestions"}
+          </button>
+
+          {error && (
+            <p role="alert" style={{ color: "#d45b55" }}>
+              {error}
+            </p>
+          )}
+
+          {result && (
+            <div style={{ marginTop: 24 }}>
+              <h2>AI Suggestions</h2>
+              <textarea
+                aria-label="Editable AI suggestions"
+                value={result}
+                onChange={(e) => setResult(e.target.value)}
+                rows={8}
+                style={fieldStyle}
+              />
+              <button
+                type="button"
+                onClick={copyResult}
+                style={buttonStyle}
+              >
+                Copy Text
+              </button>
+              <p style={{ fontSize: 13, opacity: 0.7 }}>
+                Review suggestions carefully and verify that all claims
+                accurately represent your experience.
+              </p>
+            </div>
+          )}
+        </section>
+      </div>
+    </main>
+  );
+}

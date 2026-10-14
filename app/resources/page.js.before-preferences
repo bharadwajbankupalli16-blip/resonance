@@ -1,0 +1,284 @@
+
+"use client";
+
+import { useEffect, useState } from "react";
+import Link from "next/link";
+
+const resourceData = {
+  "Data Analyst": {
+    skills: ["SQL", "Excel", "Python", "Power BI", "Statistics"],
+    projects: [
+      "Sales performance dashboard",
+      "Customer churn analysis",
+      "Exploratory data analysis on public datasets",
+    ],
+    roadmap: [
+      "Learn Excel and descriptive statistics",
+      "Practice SQL queries and joins",
+      "Analyze datasets with Python and pandas",
+      "Build dashboards with Power BI",
+      "Publish two portfolio projects",
+    ],
+    links: [
+      ["SQL Tutorial", "https://www.w3schools.com/sql/"],
+      ["Python Tutorial", "https://docs.python.org/3/tutorial/"],
+      ["Power BI Learning", "https://learn.microsoft.com/en-us/training/powerplatform/power-bi/"],
+      ["Kaggle Datasets", "https://www.kaggle.com/datasets"],
+    ],
+  },
+  "Data Scientist": {
+    skills: ["Python", "Statistics", "pandas", "Machine Learning", "SQL"],
+    projects: [
+      "Customer churn prediction",
+      "Exploratory data analysis",
+      "Compare classification models",
+    ],
+    roadmap: [
+      "Strengthen Python and statistics",
+      "Learn pandas, NumPy, and visualization",
+      "Practice feature engineering",
+      "Study machine learning fundamentals",
+      "Evaluate and document portfolio models",
+    ],
+    links: [
+      ["Python Documentation", "https://docs.python.org/3/"],
+      ["pandas Tutorials", "https://pandas.pydata.org/docs/getting_started/"],
+      ["scikit-learn Guide", "https://scikit-learn.org/stable/getting_started.html"],
+      ["Kaggle Learn", "https://www.kaggle.com/learn"],
+    ],
+  },
+  "Machine Learning Engineer": {
+    skills: ["Python", "Machine Learning", "APIs", "Git", "Model Evaluation"],
+    projects: [
+      "Build a prediction API",
+      "Compare model performance",
+      "Create a reproducible ML pipeline",
+    ],
+    roadmap: [
+      "Build strong Python foundations",
+      "Learn ML algorithms and evaluation",
+      "Practice data preparation and feature engineering",
+      "Deploy a model behind an API",
+      "Learn testing, version control, and monitoring",
+    ],
+    links: [
+      ["scikit-learn", "https://scikit-learn.org/stable/"],
+      ["PyTorch Tutorials", "https://pytorch.org/tutorials/"],
+      ["FastAPI Tutorial", "https://fastapi.tiangolo.com/tutorial/"],
+      ["Git Documentation", "https://git-scm.com/doc"],
+    ],
+  },
+  "Full Stack Developer": {
+    skills: ["HTML", "CSS", "JavaScript", "React", "Next.js", "SQL"],
+    projects: [
+      "Full-stack task manager",
+      "Authentication-enabled portfolio",
+      "Database-backed job board",
+    ],
+    roadmap: [
+      "Learn HTML, CSS, and JavaScript",
+      "Build interfaces with React",
+      "Learn Next.js routing and server APIs",
+      "Connect PostgreSQL to an application",
+      "Deploy and document a full-stack project",
+    ],
+    links: [
+      ["MDN Web Docs", "https://developer.mozilla.org/"],
+      ["React Documentation", "https://react.dev/learn"],
+      ["Next.js Learn", "https://nextjs.org/learn"],
+      ["PostgreSQL Tutorial", "https://www.postgresql.org/docs/current/tutorial.html"],
+    ],
+  },
+  "Python Developer": {
+    skills: ["Python", "Git", "Testing", "APIs", "SQL"],
+    projects: [
+      "REST API with database storage",
+      "Automated data processing tool",
+      "Python test suite for a small application",
+    ],
+    roadmap: [
+      "Learn Python syntax and data structures",
+      "Practice functions, modules, and exceptions",
+      "Use Git and automated tests",
+      "Build APIs and database integrations",
+      "Create and document a complete project",
+    ],
+    links: [
+      ["Python Tutorial", "https://docs.python.org/3/tutorial/"],
+      ["pytest Documentation", "https://docs.pytest.org/"],
+      ["FastAPI Tutorial", "https://fastapi.tiangolo.com/tutorial/"],
+      ["Git Documentation", "https://git-scm.com/doc"],
+    ],
+  },
+};
+
+const fallbackData = {
+  skills: ["Core technical concepts", "Problem solving", "Git", "Projects"],
+  projects: [
+    "Build a role-related portfolio project",
+    "Reproduce a small real-world workflow",
+    "Document and test a complete project",
+  ],
+  roadmap: [
+    "Review the fundamentals for your target role",
+    "Choose a structured beginner course",
+    "Practice with small exercises",
+    "Build and document a portfolio project",
+    "Review job descriptions and fill skill gaps",
+  ],
+  links: [
+    ["Microsoft Learn", "https://learn.microsoft.com/training/"],
+    ["freeCodeCamp", "https://www.freecodecamp.org/"],
+    ["Git Documentation", "https://git-scm.com/doc"],
+    ["Kaggle", "https://www.kaggle.com/learn"],
+  ],
+};
+
+export default function ResourcesPage() {
+  const [role, setRole] = useState("Data Analyst");
+  const [completed, setCompleted] = useState([]);
+
+  useEffect(() => {
+    setRole(localStorage.getItem("resonanceTargetRole") || "Data Analyst");
+
+    try {
+      setCompleted(
+        JSON.parse(localStorage.getItem("resonanceRoadmapCompleted") || "[]")
+      );
+    } catch {
+      setCompleted([]);
+    }
+  }, []);
+
+  const data = resourceData[role] || fallbackData;
+
+  function toggleTask(index) {
+    const next = completed.includes(`${role}-${index}`)
+      ? completed.filter((item) => item !== `${role}-${index}`)
+      : [...completed, `${role}-${index}`];
+
+    setCompleted(next);
+    localStorage.setItem("resonanceRoadmapCompleted", JSON.stringify(next));
+  }
+
+  const doneCount = data.roadmap.filter((_, index) =>
+    completed.includes(`${role}-${index}`)
+  ).length;
+
+  return (
+    <main className="career-resources">
+      <style>{`
+        .career-resources {
+          --r-bg: #f3f7f5;
+          --r-card: #fff;
+          --r-text: #17332f;
+          --r-muted: #71847e;
+          --r-border: #dce7e2;
+          min-height: 100vh;
+          padding: 32px 20px 55px;
+          box-sizing: border-box;
+          background: var(--r-bg);
+          color: var(--r-text);
+          font-family: Helvetica, Arial, sans-serif;
+        }
+        html[data-theme="dark"] .career-resources {
+          --r-bg: #0b1e1c;
+          --r-card: #142d29;
+          --r-text: #edf6f2;
+          --r-muted: #b1c5bd;
+          --r-border: #29453f;
+        }
+        .r-wrap { max-width: 1000px; margin: auto; }
+        .r-back { color: #329888; text-decoration: none; font-size: 13px; }
+        .r-kicker { margin-top: 30px; color: #329888; font-size: 11px; font-weight: 800; letter-spacing: 2px; }
+        .r-wrap h1 { font-size: clamp(28px, 5vw, 40px); margin: 9px 0; }
+        .r-intro { color: var(--r-muted); line-height: 1.7; }
+        .r-card { background: var(--r-card); border: 1px solid var(--r-border); border-radius: 17px; padding: 22px; margin-top: 17px; }
+        .r-card h2 { margin: 0 0 15px; font-size: 19px; }
+        .r-tags { display: flex; flex-wrap: wrap; gap: 9px; }
+        .r-tag { border-radius: 20px; padding: 9px 12px; background: rgba(63,161,144,.13); color: var(--r-text); font-size: 13px; }
+        .r-task { display: flex; gap: 12px; align-items: flex-start; padding: 13px 0; border-bottom: 1px solid var(--r-border); line-height: 1.6; }
+        .r-task:last-child { border-bottom: 0; }
+        .r-task input { margin-top: 4px; accent-color: #329888; }
+        .r-progress { height: 7px; border-radius: 20px; background: var(--r-border); overflow: hidden; margin: 12px 0; }
+        .r-progress div { height: 100%; background: #329888; transition: width .2s; }
+        .r-link { display: block; padding: 13px 0; border-bottom: 1px solid var(--r-border); color: #329888; text-decoration: none; overflow-wrap: anywhere; }
+        .r-link:last-child { border-bottom: 0; }
+        .r-link:hover { text-decoration: underline; }
+      `}</style>
+
+      <div className="r-wrap">
+        <Link className="r-back" href="/dashboard">← Back to Overview</Link>
+        <p className="r-kicker">CAREER DEVELOPMENT</p>
+        <h1>Resources & Roadmap</h1>
+        <p className="r-intro">
+          Your selected role: <strong>{role}</strong>. Use this learning plan
+          to structure your preparation. Resources are learning suggestions,
+          not a guarantee of employment.
+        </p>
+
+        <section className="r-card">
+          <h2>Skills to focus on</h2>
+          <div className="r-tags">
+            {data.skills.map((skill) => (
+              <span className="r-tag" key={skill}>{skill}</span>
+            ))}
+          </div>
+        </section>
+
+        <section className="r-card">
+          <h2>Your learning roadmap</h2>
+          <p style={{ color: "var(--r-muted)", fontSize: 13 }}>
+            {doneCount} of {data.roadmap.length} steps completed for this role
+          </p>
+          <div className="r-progress">
+            <div style={{ width: `${doneCount / data.roadmap.length * 100}%` }} />
+          </div>
+          {data.roadmap.map((task, index) => (
+            <label className="r-task" key={`${role}-${task}`}>
+              <input
+                type="checkbox"
+                checked={completed.includes(`${role}-${index}`)}
+                onChange={() => toggleTask(index)}
+              />
+              <span>{index + 1}. {task}</span>
+            </label>
+          ))}
+        </section>
+
+        <section className="r-card">
+          <h2>Project ideas</h2>
+          {data.projects.map((project) => (
+            <div className="r-task" key={project}>
+              <span style={{ color: "#329888" }}>✦</span>
+              <span>{project}</span>
+            </div>
+          ))}
+        </section>
+
+        <section className="r-card">
+          <h2>Learning resources</h2>
+          {data.links.map(([label, url]) => (
+            <a
+              className="r-link"
+              href={url}
+              target="_blank"
+              rel="noreferrer"
+              key={url}
+            >
+              {label} ↗
+            </a>
+          ))}
+        </section>
+
+        <section className="r-card">
+          <h2>Continue your workflow</h2>
+          <p className="r-intro">Apply your learning to your resume and job search.</p>
+          <p><Link className="r-back" href="/resume-builder">Build resume ↗</Link></p>
+          <p><Link className="r-back" href="/resume-analyzer">Analyze resume ↗</Link></p>
+          <p><Link className="r-back" href="/jobs">Explore IT jobs ↗</Link></p>
+        </section>
+      </div>
+    </main>
+  );
+}

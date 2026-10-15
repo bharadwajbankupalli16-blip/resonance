@@ -94,14 +94,15 @@ export default function HomePage() {
             with AI-powered resume and job insights.
           </p>
 
-          <div className="hero-actions">
-            <Link className="button button-teal" href="/resume-builder">
-              Build my resume <span>→</span>
-            </Link>
-            <a className="text-link" href="#features">
-              Explore features <span>{"\u2197"}</span>
-            </a>
-          </div>
+              <div className="hero-actions">
+  <Link className="button button-teal" href="/login">
+    Build my resume <span>→</span>
+  </Link>
+
+  <a className="text-link" href="#features">
+    Explore features <span>{"\u2197"}</span>
+  </a>
+</div>
         </div>
 
         <div className="hero-person" aria-hidden="true">

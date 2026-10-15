@@ -8,19 +8,19 @@ const features = [
     icon: "\u2726",
     title: "AI Resume Builder",
     description: "Build a polished, job-specific resume with guided content and professional layouts.",
-    href: "/resume-builder",
+    href: "/login",
   },
   {
     icon: "\u2726",
     title: "ATS Compatibility",
     description: "Review your resume structure, discover missing keywords, and improve readability.",
-    href: "/resume-analyzer",
+    href: "/login",
   },
   {
     icon: "\u2726",
     title: "Job Match Insights",
     description: "Compare your experience with a target role and identify relevant skills to develop.",
-    href: "/jobs",
+    href: "/login",
   },
 ];
 
@@ -194,6 +194,8 @@ export default function HomePage() {
     </main>
   );
 }
+
+
 
 
 

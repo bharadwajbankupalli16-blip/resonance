@@ -119,21 +119,18 @@ function LoginIllustration() {
   );
 }
 
-export default function LoginPage() {
- const [mode, setMode] = useState("signin");
-const [showPassword, setShowPassword] = useState(false);
-const [notice, setNotice] = useState("");
-const [loading, setLoading] = useState(false);
-
-const [otpSent, setOtpSent] = useState(false);
-const [otp, setOtp] = useState("");
-const [signupDetails, setSignupDetails] = useState(null);
-const [resending, setResending] = useState(false);
+       export default function LoginPage() {
+  const [mode, setMode] = useState("signin");
+  const [notice, setNotice] = useState("");
+  const [loading, setLoading] = useState(false);
+  const [otpSent, setOtpSent] = useState(false);
+  const [otp, setOtp] = useState("");
+  const [signupDetails, setSignupDetails] = useState(null);
 
   const router = useRouter();
   const isSignup = mode === "signup";
 
-  async function submit(e) {
+              async function submit(e) {
     e.preventDefault();
     if (loading) return;
 
@@ -142,74 +139,69 @@ const [resending, setResending] = useState(false);
 
     try {
       const form = new FormData(e.currentTarget);
-      const name = String(form.get("name") || signupDetails?.name || "").trim();
-      const email = String(form.get("email") || signupDetails?.email || "").trim().toLowerCase();
-      const password = String(form.get("password") || signupDetails?.password || "");
+      const name = String(
+        form.get("name") || signupDetails?.name || ""
+      ).trim();
+      const email = String(
+        form.get("email") || signupDetails?.email || ""
+      ).trim().toLowerCase();
 
-      if (isSignup && !otpSent) {
-        if (!name || !/^[^\s@]+@[^\s@]+\.[^\s@]+$/.test(email) || password.length < 8 || password.length > 128) {
-          setNotice("Enter your name, a valid email, and a password between 8 and 128 characters.");
+    if (!/^[^\s@]+@[^\s@]+\.[^\s@]+$/.test(email)) {
+        setNotice("Enter a valid email address.");
+        return;
+      }
+
+      // First submit: request an email OTP.
+      if (!otpSent) {
+        if (isSignup && !name) {
+          setNotice("Enter your full name.");
           return;
         }
 
         const response = await fetch("/api/otp/request", {
           method: "POST",
           headers: { "Content-Type": "application/json" },
-          body: JSON.stringify({ email }),
+          body: JSON.stringify({
+            email,
+            purpose: isSignup ? "signup" : "signin",
+          }),
         });
+
         const data = await response.json();
+
         if (!response.ok) {
           setNotice(data.error || "Unable to send the verification code.");
           return;
         }
 
-        setSignupDetails({ name, email, password });
+        setSignupDetails({ name, email });
         setOtpSent(true);
-        setNotice(data.message || "Check your email for the six-digit verification code.");
+        setNotice(data.message || "Check your email for the six-digit code.");
         return;
       }
 
-      if (isSignup && otpSent) {
-        if (!signupDetails || !/^\d{6}$/.test(otp)) {
-          setNotice("Enter the six-digit verification code.");
-          return;
-        }
-
-        const response = await fetch("/api/otp/verify", {
-          method: "POST",
-          headers: { "Content-Type": "application/json" },
-          body: JSON.stringify({ ...signupDetails, code: otp }),
-        });
-        const data = await response.json();
-
-        if (!response.ok) {
-          setNotice(data.error || "Verification failed.");
-          return;
-        }
-
-        setMode("signin");
-        setOtpSent(false);
-        setOtp("");
-        setSignupDetails(null);
-        setNotice("Email verified and account created. Please sign in.");
+      // Second submit: verify the OTP and create a session.
+      if (!/^\d{6}$/.test(otp)) {
+        setNotice("Enter the six-digit verification code.");
         return;
       }
 
-       
-const result = await signIn("credentials", {
-  redirect: false,
-  callbackUrl: "https://resonance-ai-resume.vercel.app/dashboard",
-});
+      const result = await signIn("credentials", {
+        redirect: false,
+        email,
+        code: otp,
+        name: isSignup ? name : "",
+        purpose: isSignup ? "signup" : "signin",
+        callbackUrl: "https://resonance-ai-resume.vercel.app/dashboard",
+      });
 
-if (result?.ok) {
-  window.location.href =
-    "https://resonance-ai-resume.vercel.app/dashboard";
-}
+      if (!result || result.error || !result.ok) {
+        setNotice("The code is invalid or expired. Request a new code and try again.");
+        return;
+      }
 
-  window.location.href =
-  "https://resonance-ai-resume.vercel.app/dashboard";
-      
-      
+      window.location.href =
+        "https://resonance-ai-resume.vercel.app/dashboard";
     } catch (error) {
       console.error("Authentication error:", error);
       setNotice("Unable to connect. Please try again.");
@@ -343,48 +335,7 @@ if (result?.ok) {
                 </div>
               </label>
 
-              <label>
-                Password
-
-                <div className="input-wrap">
-                  <span aria-hidden="true">▣</span>
-
-                  <input
-                    name="password"
-                    type={showPassword ? "text" : "password"}
-                    placeholder={
-                      isSignup
-                        ? "Create a password"
-                        : "Enter your password"
-                    }
-                    autoComplete={
-                      isSignup ? "new-password" : "current-password"
-                    }
-                    minLength={isSignup ? 8 : undefined}
-                    maxLength={128}
-                    required
-                  />
-
-                  <button
-                    type="button"
-                    className="show-password"
-                    onClick={() =>
-                      setShowPassword((value) => !value)
-                    }
-                    aria-label={
-                      showPassword ? "Hide password" : "Show password"
-                    }
-                  >
-                    {showPassword ? "Hide" : "Show"}
-                  </button>
-                </div>
-
-                {isSignup && (
-                  <small className="password-hint">
-                    Use at least 8 characters.
-                  </small>
-                )}
-              </label>              {isSignup && otpSent && (
+                         {otpSent && (
                 <label>
                   Email verification code
                   <div className="input-wrap">

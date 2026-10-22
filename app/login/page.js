@@ -195,20 +195,21 @@ const [resending, setResending] = useState(false);
         return;
       }
 
-      const result = await signIn("credentials", {
-        email,
-        password,
-        redirect: false,
-        callbackUrl: "/dashboard",
-      });
+       
+const result = await signIn("credentials", {
+  redirect: false,
+  callbackUrl: "https://resonance-ai-resume.vercel.app/dashboard",
+});
 
-      if (!result || result.error) {
-        setNotice("Incorrect email or password. Please try again.");
-        return;
-      }
+if (result?.ok) {
+  window.location.href =
+    "https://resonance-ai-resume.vercel.app/dashboard";
+}
 
-      router.push(result.url || "/dashboard");
-      router.refresh();
+  window.location.href =
+  "https://resonance-ai-resume.vercel.app/dashboard";
+      
+      
     } catch (error) {
       console.error("Authentication error:", error);
       setNotice("Unable to connect. Please try again.");
